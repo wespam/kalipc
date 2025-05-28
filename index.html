@@ -75,6 +75,7 @@
     const customWidth = document.getElementById('customWidth');
     const customHeight = document.getElementById('customHeight');
     const applyCustom = document.getElementById('applyCustom');
+    const controls = document.getElementById('controls');
 
     let currentWidth = 1980;
     let currentHeight = 1080;
@@ -112,7 +113,13 @@
     applyCustom.addEventListener('click', applyCustomResolution);
     preset.addEventListener('change', applyPreset);
     window.addEventListener('resize', () => resizeVNC(currentWidth, currentHeight));
-    window.addEventListener('load', () => resizeVNC(currentWidth, currentHeight));
+    window.addEventListener('load', () => {
+      applyPreset();
+      // Hide controls after 10 seconds
+      setTimeout(() => {
+        controls.style.display = 'none';
+      }, 10000);
+    });
   </script>
 
 </body>
