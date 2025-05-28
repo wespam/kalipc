@@ -39,12 +39,17 @@
       font-size: 14px;
     }
 
-    #vnc-frame {
+    #wrapper {
       position: absolute;
-      top: 0;
-      left: 0;
-      border: none;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       transform-origin: top left;
+    }
+
+    #vnc-frame {
+      display: block;
+      border: none;
     }
   </style>
 </head>
@@ -55,7 +60,7 @@
     <select id="preset">
       <option value="800x600">800 x 600</option>
       <option value="1024x768">1024 x 768</option>
-      <option value="600x800">600 x 800</option>
+      <option value="1980x1080" selected>1980 x 1080</option>
     </select>
 
     <label for="customWidth">Custom:</label>
@@ -64,16 +69,22 @@
     <button id="applyCustom">Apply</button>
   </div>
 
-  <iframe id="vnc-frame" src="https://obliging-rested-mite.ngrok-free.app/vnc.html" allowfullscreen></iframe>
+  <div id="wrapper">
+    <iframe id="vnc-frame" src="https://obliging-rested-mite.ngrok-free.app/vnc.html" allowfullscreen></iframe>
+  </div>
 
   <script>
     const iframe = document.getElementById('vnc-frame');
+    const wrapper = document.getElementById('wrapper');
     const preset = document.getElementById('preset');
     const customWidth = document.getElementById('customWidth');
     const customHeight = document.getElementById('customHeight');
     const applyCustom = document.getElementById('applyCustom');
 
-    function resizeIframe(width, height) {
+    let currentWidth = 1980;
+    let currentHeight = 1080;
+
+    function resizeWrapper(width, height) {
       const screenWidth = window.innerWidth;
       const screenHeight = window.innerHeight;
 
@@ -81,30 +92,35 @@
       const scaleY = screenHeight / height;
       const scale = Math.min(scaleX, scaleY);
 
+      wrapper.style.width = `${width}px`;
+      wrapper.style.height = `${height}px`;
+      wrapper.style.transform = `translate(-50%, -50%) scale(${scale})`;
+
       iframe.style.width = `${width}px`;
       iframe.style.height = `${height}px`;
-      iframe.style.transform = `scale(${scale})`;
-      iframe.style.left = `${(screenWidth - width * scale) / 2}px`;
-      iframe.style.top = `${(screenHeight - height * scale) / 2}px`;
     }
 
     function applyPreset() {
       const [w, h] = preset.value.split('x').map(Number);
-      resizeIframe(w, h);
+      currentWidth = w;
+      currentHeight = h;
+      resizeWrapper(w, h);
     }
 
     function applyCustomResolution() {
       const w = parseInt(customWidth.value, 10);
       const h = parseInt(customHeight.value, 10);
       if (!isNaN(w) && !isNaN(h) && w > 0 && h > 0) {
-        resizeIframe(w, h);
+        currentWidth = w;
+        currentHeight = h;
+        resizeWrapper(w, h);
       }
     }
 
     preset.addEventListener('change', applyPreset);
     applyCustom.addEventListener('click', applyCustomResolution);
-    window.addEventListener('resize', applyPreset);
-    window.addEventListener('load', applyPreset);
+    window.addEventListener('resize', () => resizeWrapper(currentWidth, currentHeight));
+    window.addEventListener('load', () => resizeWrapper(currentWidth, currentHeight));
   </script>
 
 </body>
