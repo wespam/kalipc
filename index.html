@@ -39,17 +39,12 @@
       font-size: 14px;
     }
 
-    #wrapper {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      transform-origin: top left;
-    }
-
     #vnc-frame {
-      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
       border: none;
+      transform-origin: top left;
     }
   </style>
 </head>
@@ -69,13 +64,10 @@
     <button id="applyCustom">Apply</button>
   </div>
 
-  <div id="wrapper">
-    <iframe id="vnc-frame" src="https://obliging-rested-mite.ngrok-free.app/vnc.html" allowfullscreen></iframe>
-  </div>
+  <iframe id="vnc-frame" src="https://obliging-rested-mite.ngrok-free.app/vnc.html" allowfullscreen></iframe>
 
   <script>
     const iframe = document.getElementById('vnc-frame');
-    const wrapper = document.getElementById('wrapper');
     const preset = document.getElementById('preset');
     const customWidth = document.getElementById('customWidth');
     const customHeight = document.getElementById('customHeight');
@@ -84,7 +76,7 @@
     let currentWidth = 1980;
     let currentHeight = 1080;
 
-    function resizeWrapper(width, height) {
+    function resizeIframe(width, height) {
       const screenWidth = window.innerWidth;
       const screenHeight = window.innerHeight;
 
@@ -92,19 +84,18 @@
       const scaleY = screenHeight / height;
       const scale = Math.min(scaleX, scaleY);
 
-      wrapper.style.width = `${width}px`;
-      wrapper.style.height = `${height}px`;
-      wrapper.style.transform = `translate(-50%, -50%) scale(${scale})`;
-
       iframe.style.width = `${width}px`;
       iframe.style.height = `${height}px`;
+      iframe.style.transform = `scale(${scale})`;
+      iframe.style.left = `0px`;
+      iframe.style.top = `0px`;
     }
 
     function applyPreset() {
       const [w, h] = preset.value.split('x').map(Number);
       currentWidth = w;
       currentHeight = h;
-      resizeWrapper(w, h);
+      resizeIframe(w, h);
     }
 
     function applyCustomResolution() {
@@ -113,14 +104,14 @@
       if (!isNaN(w) && !isNaN(h) && w > 0 && h > 0) {
         currentWidth = w;
         currentHeight = h;
-        resizeWrapper(w, h);
+        resizeIframe(w, h);
       }
     }
 
     preset.addEventListener('change', applyPreset);
     applyCustom.addEventListener('click', applyCustomResolution);
-    window.addEventListener('resize', () => resizeWrapper(currentWidth, currentHeight));
-    window.addEventListener('load', () => resizeWrapper(currentWidth, currentHeight));
+    window.addEventListener('resize', () => resizeIframe(currentWidth, currentHeight));
+    window.addEventListener('load', () => resizeIframe(currentWidth, currentHeight));
   </script>
 
 </body>
