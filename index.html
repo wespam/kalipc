@@ -2,31 +2,32 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <!-- Use viewport-fit=cover to allow full use of screen on iOS and some Android -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Kali Root</title>
   <style>
+    /* Reset margins and make html/body fill viewport */
     html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      width: 100%;
-      background: black;
+      margin: 0; padding: 0;
+      height: 100%; width: 100%;
       overflow: hidden;
+      background: black;
     }
 
-    iframe {
+    /* Fullscreen fixed iframe with !important overrides */
+    iframe#fullFrame {
       position: fixed !important;
       top: 0 !important;
       left: 0 !important;
       right: 0 !important;
       bottom: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
       border: none !important;
       margin: 0 !important;
       padding: 0 !important;
-      width: 100% !important;
-      height: 100% !important;
       display: block !important;
-      z-index: 9999 !important;
+      z-index: 999999 !important;
     }
   </style>
 </head>
@@ -34,17 +35,21 @@
   <iframe id="fullFrame" src="https://obliging-rested-mite.ngrok-free.app/vnc.html" allowfullscreen></iframe>
 
   <script>
-    function forceResize() {
+    // Set the iframe size to the visible viewport dimensions on load and resize
+    function resizeIframe() {
       const iframe = document.getElementById('fullFrame');
+      // Set width and height to window.innerWidth and innerHeight to avoid vh quirks on mobile
       iframe.style.width = window.innerWidth + 'px';
       iframe.style.height = window.innerHeight + 'px';
     }
 
-    window.addEventListener('load', forceResize);
-    window.addEventListener('resize', forceResize);
+    // Run resize on load, resize, and orientation change events
+    window.addEventListener('load', resizeIframe);
+    window.addEventListener('resize', resizeIframe);
+    window.addEventListener('orientationchange', resizeIframe);
 
-    // Also try to fix on orientation change (mobile)
-    window.addEventListener('orientationchange', forceResize);
+    // Optional: periodically fix size in case browser UI shifts dynamically
+    setInterval(resizeIframe, 1000);
   </script>
 </body>
 </html>
