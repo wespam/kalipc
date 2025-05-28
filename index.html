@@ -12,6 +12,31 @@
       height: 100%;
       overflow: hidden;
       background: black;
+      font-family: sans-serif;
+    }
+
+    #controls {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 10;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 8px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    #controls input, #controls select, #controls button {
+      background: #111;
+      color: white;
+      border: 1px solid #444;
+      border-radius: 5px;
+      padding: 4px 8px;
+      font-size: 14px;
     }
 
     #vnc-frame {
@@ -21,34 +46,32 @@
       border: none;
       transform-origin: top left;
     }
-
-    #resolution-switcher {
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      z-index: 10;
-      background: rgba(0, 0, 0, 0.7);
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      font-size: 14px;
-      border-radius: 6px;
-    }
   </style>
 </head>
 <body>
 
-  <select id="resolution-switcher">
-    <option value="800x600">800 x 600</option>
-    <option value="1024x768">1024 x 768</option>
-    <option value="600x800">600 x 800</option>
-  </select>
+  <div id="controls">
+    <label for="preset">Preset:</label>
+    <select id="preset">
+      <option value="800x600">800 x 600</option>
+      <option value="1024x768">1024 x 768</option>
+      <option value="600x800">600 x 800</option>
+    </select>
+
+    <label for="customWidth">Custom:</label>
+    <input type="number" id="customWidth" placeholder="Width" min="100" />
+    <input type="number" id="customHeight" placeholder="Height" min="100" />
+    <button id="applyCustom">Apply</button>
+  </div>
 
   <iframe id="vnc-frame" src="https://obliging-rested-mite.ngrok-free.app/vnc.html" allowfullscreen></iframe>
 
   <script>
     const iframe = document.getElementById('vnc-frame');
-    const resolutionSwitcher = document.getElementById('resolution-switcher');
+    const preset = document.getElementById('preset');
+    const customWidth = document.getElementById('customWidth');
+    const customHeight = document.getElementById('customHeight');
+    const applyCustom = document.getElementById('applyCustom');
 
     function resizeIframe(width, height) {
       const screenWidth = window.innerWidth;
@@ -65,14 +88,23 @@
       iframe.style.top = `${(screenHeight - height * scale) / 2}px`;
     }
 
-    function applySelectedResolution() {
-      const [w, h] = resolutionSwitcher.value.split('x').map(Number);
+    function applyPreset() {
+      const [w, h] = preset.value.split('x').map(Number);
       resizeIframe(w, h);
     }
 
-    resolutionSwitcher.addEventListener('change', applySelectedResolution);
-    window.addEventListener('resize', applySelectedResolution);
-    window.addEventListener('load', applySelectedResolution);
+    function applyCustomResolution() {
+      const w = parseInt(customWidth.value, 10);
+      const h = parseInt(customHeight.value, 10);
+      if (!isNaN(w) && !isNaN(h) && w > 0 && h > 0) {
+        resizeIframe(w, h);
+      }
+    }
+
+    preset.addEventListener('change', applyPreset);
+    applyCustom.addEventListener('click', applyCustomResolution);
+    window.addEventListener('resize', applyPreset);
+    window.addEventListener('load', applyPreset);
   </script>
 
 </body>
